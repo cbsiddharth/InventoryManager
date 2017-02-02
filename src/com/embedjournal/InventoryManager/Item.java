@@ -1,5 +1,7 @@
 package com.embedjournal.InventoryManager;
 
+import java.util.Hashtable;
+
 public class Item {
 	public static final String protoNameManfpn = "Manufacturer Part No";
 	public static final String protoNameManf   = "Manufacturer";
@@ -13,21 +15,21 @@ public class Item {
 	public static final String protoIdentDesc   = "DESC";
 	public static final String protoIdentStock  = "STOCK";
 
-	public static String[] protoIdentifiers = { 
+	public static String[] prototype = { 
 			protoIdentManfpn, protoIdentManf, protoIdentFprint, protoIdentDesc, protoIdentStock
 	};
-	public static String[] protoNames = {
-			protoNameManfpn, protoNameManf, protoNameFprint, protoNameDesc, protoNameStock
-	};
+
+	@SuppressWarnings("serial")
+	public static Hashtable<String, String> protoName = new Hashtable<String, String>() {{
+		put(protoIdentManfpn, protoNameManfpn);
+		put(protoIdentManf, protoNameManf);
+		put(protoIdentFprint, protoNameFprint);
+		put(protoIdentDesc, protoNameDesc);
+		put(protoIdentStock, protoNameStock);
+	}};
 
 	private String protoManfpn, protoManf, protoFprint, protoDesc;
 	private int protoStock;
-
-	@Override
-	public String toString() {
-		return "'" + protoManfpn + "', '" + protoManf + "', '" + protoFprint
-				+ "', '" + protoDesc + "', " + protoStock + " ";
-	}
 
 	public Item() {
 		this.protoManfpn = ""; this.protoManf = "";
@@ -51,6 +53,11 @@ public class Item {
 	}
 
 	@Override
+	public String toString() {
+		return "'" + protoManfpn + "', '" + protoManf + "', '" + protoFprint
+				+ "', '" + protoDesc + "', " + protoStock + " ";
+	}
+
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
