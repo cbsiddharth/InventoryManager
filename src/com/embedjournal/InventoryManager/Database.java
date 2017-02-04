@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.embedjournal.InventoryManager.model.Item;
+
 class SQLite {
 
 	private Connection connection = null;
@@ -129,12 +131,4 @@ public class Database {
 		}
 		return itemList;
 	}
-
-	public static void main(String[] args) {
-		System.out.println(CREATE_INVENTORY_TABLE);
-		System.out.println(INSERT_ITEM);
-		System.out.println(SELECT_ALL_ITEMS);
-		System.out.println(UPDATE_ITEM);
-	}
-
 }

@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
+import com.embedjournal.InventoryManager.model.Item;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
@@ -29,9 +30,8 @@ public class Inventory {
 		return db.getItemList();
 	}
 
-	public void exportToCSV(String fileName) throws Exception {
+	public void exportToCSV(String fileName, ArrayList<Item> itemList) throws Exception {
 		String[] entries = new String[5];
-		ArrayList<Item> itemList = this.getItemListfromDB();
 		CSVWriter writer = new CSVWriter(new FileWriter(fileName));
 		writer.writeNext(Item.protoName);
 		for (Item item : itemList) {
@@ -44,13 +44,21 @@ public class Inventory {
 		}
 		writer.close();
 	}
+	
+	public void exportInventoryToCSV(String fileName) {
+		ArrayList<Item> itemList = this.getItemListfromDB();
+		try {
+			exportToCSV(fileName, itemList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-	public int importFromCSV(String fileName) throws Exception {
-		CSVReader reader = new CSVReader(new FileReader(fileName), ',', '"', 1);
+	public ArrayList<Item> importFromCSV(String fileName) throws Exception {
 		String[] nextLine;
+		CSVReader reader = new CSVReader(new FileReader(fileName), ',', '"', 1);
 		ArrayList<Item> itemList = new ArrayList<Item>();
 		while ((nextLine = reader.readNext()) != null) {
-			// nextLine[] is an array of values from the line
 			String mpno = nextLine[0];
 			String mp = nextLine[1];
 			String fp = nextLine[2];
@@ -60,18 +68,18 @@ public class Inventory {
 			itemList.add(item);
 		}
 		reader.close();
-		return insertItemListToDB(itemList);
+		return itemList;
 	}
-
-	public static void main(String[] args) {
-		Inventory in = new Inventory();
+	
+	public int importInventoryFromCSV(String fileName) {
+		int numInserted = 0;
 		try {
-			System.out.println("Importing from import.csv");
-			System.out.println("Imported: " + in.importFromCSV("res/import.csv"));
-			in.exportToCSV("res/export.csv");
-			System.out.println("Exported to export.csv");
-		} catch (Exception ex) {
-			System.out.println("Err" + ex);
+			ArrayList<Item> itemList = importFromCSV(fileName);
+			numInserted = insertItemListToDB(itemList);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		return numInserted;
 	}
 }
