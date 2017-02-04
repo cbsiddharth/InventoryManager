@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.embedjournal.InventoryManager.view.RootLayoutController">
+<BorderPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.embedjournal.InventoryManager.view.RootLayoutController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -23,7 +23,7 @@
                      </accelerator>
                   </MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem mnemonicParsing="false" onAction="#exitApplication" text="Close">
+              <MenuItem mnemonicParsing="false" onAction="#menuActionExitApplication" text="Close">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="W" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
@@ -34,8 +34,9 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Tools">
             <items>
-              <MenuItem mnemonicParsing="false" text="Import" />
-                  <MenuItem mnemonicParsing="false" text="Export" />
+              <MenuItem mnemonicParsing="false" text="Import Inventory" />
+                  <MenuItem mnemonicParsing="false" text="Export Inventory" />
+                  <MenuItem mnemonicParsing="false" onAction="#menuActionExportSelection" text="Export Selection" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Help">

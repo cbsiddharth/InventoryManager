@@ -3,34 +3,40 @@ package com.embedjournal.InventoryManager;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.embedjournal.InventoryManager.model.Item;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 public class Inventory {
-
-	public int insertItemListToDB(ArrayList<Item> list) {
-		Database db = null;
+	
+	private Database database = null;
+	public Inventory(String dbFile) {
 		try {
-			db = new Database();
+			this.database = new Database(dbFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return db.insertItemList(list);
 	}
 
-	public ArrayList<Item> getItemListfromDB() {
-		Database db = null;
-		try {
-			db = new Database();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return db.getItemList();
+	public int insertItemListToDB(List<Item> list) {
+		return this.database.insertItemList(list);
+	}
+	
+	public void deleteItemListFromDB(List<Item> list) {
+		database.delteItemList(list);
 	}
 
-	public void exportToCSV(String fileName, ArrayList<Item> itemList) throws Exception {
+	public List<Item> getItemListfromDB() {
+		return this.database.getItemList();
+	}
+	
+	public boolean updateItem(Item item) {
+		return this.database.updateItem(item);
+	}
+
+	public void exportToCSV(String fileName, List<Item> itemList) throws Exception {
 		String[] entries = new String[5];
 		CSVWriter writer = new CSVWriter(new FileWriter(fileName));
 		writer.writeNext(Item.protoName);
@@ -46,7 +52,7 @@ public class Inventory {
 	}
 	
 	public void exportInventoryToCSV(String fileName) {
-		ArrayList<Item> itemList = this.getItemListfromDB();
+		List<Item> itemList = this.getItemListfromDB();
 		try {
 			exportToCSV(fileName, itemList);
 		} catch (Exception e) {
@@ -54,10 +60,10 @@ public class Inventory {
 		}
 	}
 
-	public ArrayList<Item> importFromCSV(String fileName) throws Exception {
+	public List<Item> importFromCSV(String fileName) throws Exception {
 		String[] nextLine;
 		CSVReader reader = new CSVReader(new FileReader(fileName), ',', '"', 1);
-		ArrayList<Item> itemList = new ArrayList<Item>();
+		List<Item> itemList = new ArrayList<Item>();
 		while ((nextLine = reader.readNext()) != null) {
 			String mpno = nextLine[0];
 			String mp = nextLine[1];
@@ -74,7 +80,7 @@ public class Inventory {
 	public int importInventoryFromCSV(String fileName) {
 		int numInserted = 0;
 		try {
-			ArrayList<Item> itemList = importFromCSV(fileName);
+			List<Item> itemList = importFromCSV(fileName);
 			numInserted = insertItemListToDB(itemList);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

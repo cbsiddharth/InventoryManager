@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 import com.embedjournal.InventoryManager.model.Item;
 
@@ -48,7 +48,6 @@ class SQLite {
 
 public class Database {
 
-	private static final String DB_FILE_NAME = "res/Inventory.DB";
 	private static final String TABLE_NAME = "INVENTORY";
 	private static final String CREATE_INVENTORY_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
 			+ Item.protoIdentManfpn + " PRIMARY KEY NOT NULL, " + Item.protoIdentManf + " TEXT, "
@@ -59,16 +58,39 @@ public class Database {
 	private static final String UPDATE_ITEM = "UPDATE " + TABLE_NAME + " SET " + Item.protoIdentManf + "=?, "
 			+ Item.protoIdentFprint + "=?, " + Item.protoIdentDesc + "=?, " + Item.protoIdentStock + "=? "
 			+ "WHERE " + Item.protoIdentManfpn + "=?;";
-	
-	public Database() throws Exception {
-		SQLite database = new SQLite(DB_FILE_NAME);
+	private static final String DELETE_ITEM = "DELETE FROM INVENTORY WHERE " + Item.protoIdentManfpn + " in (#)";
+	private String dbFile;
+
+	public Database(String dbFile) throws Exception {
+		this.dbFile = dbFile;
+		SQLite database = new SQLite(this.dbFile);
 		database.executeUpdate(CREATE_INVENTORY_TABLE);
+	}
+	
+	public void delteItemList(List<Item> list) {
+		String s = ""; int pos = 1;
+		for (int i=0; i<10; i++) {
+			if (i != 0) s += ",";
+			s += "?";
+		}
+		String stmt = DELETE_ITEM.replaceFirst("#", s);
+		try {
+			SQLite database = new SQLite(this.dbFile);
+			PreparedStatement pst = database.getPrepareStatement(stmt);
+			for (Item item: list)
+				pst.setString(pos++, item.getManufPno());
+			pst.executeUpdate();
+			pst.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public boolean updateItem(Item item) {
 		boolean result = true;
 		try {
-			SQLite database = new SQLite(DB_FILE_NAME);
+			SQLite database = new SQLite(this.dbFile);
 			PreparedStatement pst = database.getPrepareStatement(UPDATE_ITEM);
 			pst.setString(1, item.getManufacturer());
 			pst.setString(2, item.getFootPrint());
@@ -86,7 +108,7 @@ public class Database {
 	public boolean insertItem(Item item) {
 		boolean result = true;
 		try {
-			SQLite database = new SQLite(DB_FILE_NAME);
+			SQLite database = new SQLite(this.dbFile);
 			PreparedStatement pst = database.getPrepareStatement(INSERT_ITEM);
 			pst.setString(1, item.getManufPno());
 			pst.setString(2, item.getManufacturer());
@@ -101,20 +123,19 @@ public class Database {
 		return result;
 	}
 
-	public int insertItemList(ArrayList<Item> itemList) {
+	public int insertItemList(List<Item> itemList) {
 		int num = 0;
-		Iterator<Item> itemIterator = itemList.iterator();
-		while (itemIterator.hasNext()) {
-			if (this.insertItem(itemIterator.next()) == true)
+		for (Item i: itemList) {
+			if (this.insertItem(i) == true)
 				num++;
 		}
 		return num;
 	}
 
-	public ArrayList<Item> getItemList() {
-		ArrayList<Item> itemList = new ArrayList<Item>();
+	public List<Item> getItemList() {
+		List<Item> itemList = new ArrayList<Item>();
 		try {
-			SQLite database = new SQLite(DB_FILE_NAME);
+			SQLite database = new SQLite(this.dbFile);
 			ResultSet rs = database.executeQuery(SELECT_ALL_ITEMS);
 			while (rs.next()) {
 				String mpno = rs.getString(Item.protoIdentManfpn);
